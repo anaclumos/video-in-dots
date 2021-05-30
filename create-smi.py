@@ -20,8 +20,8 @@ class braille_config:
 
 
 class video_config:
-    width = 80
-    height = 40
+    width = 64
+    height = 27
 
 
 def resize(image: Image.Image, width: int, height: int) -> Image.Image:
@@ -59,7 +59,7 @@ P {font-family: sans-serif; color:white;}
 with open(f"{video_name}.smi", "a", encoding="UTF-8") as file:
     file.write(smi_string + "\n")
 
-for idx in range(0, len(frames_folder), 3):
+for idx in range(0, len(frames_folder)):
     normalized_path = os.path.abspath(
         f"{os.getcwd()}/frames/{video_name}/f{idx}.{file_format}"
     )
@@ -73,6 +73,9 @@ for idx in range(0, len(frames_folder), 3):
     terminal_string += f"{convert_timedelta_to_srt_format(one_frame_in_ms, idx)} --> {convert_timedelta_to_srt_format(one_frame_in_ms, idx + 1)}\n"
 
     smi_string = f"<SYNC Start={convert_timedelta_to_srt_format(one_frame_in_ms, idx)}><P Class=KOKRCC>"
+
+    color_stack_color = ""
+    color_stack_value = ""
 
     for h in range(0, resized_image.height, braille_config.height):
         for w in range(0, resized_image.width, braille_config.width):
@@ -99,7 +102,22 @@ for idx in range(0, len(frames_folder), 3):
                 braille_r, braille_g, braille_b, chr(output)
             )
             hex_color = "#%02X%02X%02X" % (braille_r, braille_g, braille_b)
-            smi_string += f'<FONT color="{hex_color}">' + chr(output) + "</FONT>"
+            if color_stack_color == hex_color:
+                color_stack_value += chr(output)
+            else:
+                if color_stack_value != "":
+                    smi_string += (
+                        f'<FONT color="{color_stack_color}">'
+                        + color_stack_value
+                        + "</FONT>"
+                    )
+                color_stack_color = hex_color
+                color_stack_value = chr(output)
+        smi_string += (
+            f'<FONT color="{color_stack_color}">' + color_stack_value + "</FONT>"
+        )
+        color_stack_color = ""
+        color_stack_value = ""
         terminal_string += "\n"
         smi_string += "<BR>"
     smi_string += "</SYNC>"
