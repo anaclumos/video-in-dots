@@ -20,8 +20,8 @@ class braille_config:
 
 
 class video_config:
-    width = 64
-    height = 27
+    width = 56
+    height = 24
 
 
 def resize(image: Image.Image, width: int, height: int) -> Image.Image:
@@ -59,7 +59,7 @@ P {font-family: sans-serif; color:white;}
 with open(f"{video_name}.smi", "a", encoding="UTF-8") as file:
     file.write(smi_string + "\n")
 
-for idx in range(0, len(frames_folder)):
+for idx in range(0, len(frames_folder), 3):
     normalized_path = os.path.abspath(
         f"{os.getcwd()}/frames/{video_name}/f{idx}.{file_format}"
     )
