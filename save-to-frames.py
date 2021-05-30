@@ -2,7 +2,7 @@ import cv2
 import os
 import pathlib
 
-video = "/Users/sunghyuncho/Movies/butter.mp4"
+video = "/Users/sunghyuncho/Movies/fiesta.mp4"
 
 
 class termcolor:
@@ -67,6 +67,7 @@ while cap.isOpened():
         count += 1
         if cv2.waitKey(10) & 0xFF == ord("q"):
             break
+fps = cap.get(cv2.CAP_PROP_FPS)
 video_frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 cap.release()
 cv2.destroyAllWindows()
@@ -104,3 +105,5 @@ else:
         + termcolor.ENDC
         + f"The folder {filename} has {number_of_saved_frames} frames, but the video has {video_frame_count} frames."
     )
+
+print(f"FPS: {termcolor.OKGREEN + str(fps) + termcolor.ENDC}")
