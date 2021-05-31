@@ -21,7 +21,7 @@ class braille_config:
 
 class video_config:
     width = 192
-    height = 82
+    height = 108
 
 
 def resize(image: Image.Image, width: int, height: int) -> Image.Image:
@@ -63,6 +63,9 @@ for idx in range(len(frames_folder)):
     srt_string = f"{idx + 1}\n"
     srt_string += f"{convert_timedelta_to_srt_format(one_frame_in_ms, idx)} --> {convert_timedelta_to_srt_format(one_frame_in_ms, idx + 1)}\n"
 
+    color_stack_color = ""
+    color_stack_value = ""
+
     for h in range(0, resized_image.height, braille_config.height):
         for w in range(0, resized_image.width, braille_config.width):
             braille = [False] * braille_config.width * braille_config.height
@@ -89,7 +92,22 @@ for idx in range(len(frames_folder)):
             #     braille_r, braille_g, braille_b, chr(output)
             # )
             hex_color = "#%02X%02X%02X" % (braille_r, braille_g, braille_b)
-            srt_string += f'<font color="#{hex_color}">' + chr(output) + "</font>"
+            if color_stack_color == hex_color:
+                color_stack_value += chr(output)
+            else:
+                if color_stack_value != "":
+                    srt_string += (
+                        f'<font color="#{color_stack_color}">'
+                        + color_stack_value
+                        + "</font>"
+                    )
+                color_stack_color = hex_color
+                color_stack_value = chr(output)
+        srt_string += (
+            f'<font color="#{color_stack_color}">' + color_stack_value + "</font>"
+        )
+        color_stack_color = ""
+        color_stack_value = ""
         srt_string += "\n"
     with open(f"{video_name}.srt", "a", encoding="UTF-8") as file:
         file.write(srt_string + "\n")
