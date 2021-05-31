@@ -1,7 +1,8 @@
 from PIL import Image
 import os
 
-video_name = "butter"
+video_name = input("video name: ")
+preview = input("turn on preview? (y/n) : ").lower() == "y"
 fps = 23.980618307905036
 file_format = "jpg"
 
