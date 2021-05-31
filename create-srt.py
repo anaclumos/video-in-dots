@@ -2,6 +2,7 @@ from PIL import Image
 import os
 
 video_name = input("video name: ")
+dithering = input("enable dithering? (y/n) : ").lower() == "y"
 fps = 23.980458527730313
 file_format = "jpg"
 
@@ -20,8 +21,8 @@ class braille_config:
 
 
 class video_config:
-    width = 192
-    height = 108
+    width = 96
+    height = 54
 
 
 def resize(image: Image.Image, width: int, height: int) -> Image.Image:
@@ -55,7 +56,7 @@ for idx in range(len(frames_folder)):
 
     # (image, weight, height). 0 as height means auto
     resized_image = resize(im, video_config.width, video_config.height)
-    resized_image_bw = resized_image.convert("1")  # apply dithering
+    resized_image_bw = resized_image.convert("1", dither=dithering)  # apply dithering
 
     px = resized_image.load()
     pxbw = resized_image_bw.load()
