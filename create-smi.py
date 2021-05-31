@@ -41,10 +41,6 @@ def convert_timedelta_to_srt_format(delta_in_ms: float, framecount: int):
     return int(time)
 
 
-def grayscale(red: int, green: int, blue: int) -> int:
-    return int(0.2126 * red + 0.7152 * green + 0.0722 * blue)
-
-
 hex_threshold = 127
 frames_folder = sorted(os.listdir(os.getcwd() + "/frames/" + video_name))
 one_frame_in_ms = 1000.0 / fps
