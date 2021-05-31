@@ -36,16 +36,16 @@ def resize(image: Image.Image, width: int, height: int) -> Image.Image:
     return image.resize((width, height))
 
 
-def grayscale(red: int, green: int, blue: int) -> int:
-    return int(0.2126 * red + 0.7152 * green + 0.0722 * blue)
-
-
 def convert_timedelta_to_srt_format(delta_in_ms: float, framecount: int):
     time = delta_in_ms * framecount
     return int(time)
 
 
-hex_threshold = 128
+def grayscale(red: int, green: int, blue: int) -> int:
+    return int(0.2126 * red + 0.7152 * green + 0.0722 * blue)
+
+
+hex_threshold = 127
 frames_folder = sorted(os.listdir(os.getcwd() + "/frames/" + video_name))
 one_frame_in_ms = 1000.0 / fps
 terminal_columns, terminal_rows = os.get_terminal_size(0)
@@ -66,13 +66,15 @@ for idx in range(0, len(frames_folder), video_config.frame_jump):
         f"{os.getcwd()}/frames/{video_name}/f{idx}.{file_format}"
     )
     im = Image.open(normalized_path)
-
     # (image, weight, height). 0 as height means auto
     resized_image = resize(im, video_config.width, video_config.height)
+    resized_image_bw = resized_image.convert("1")  # apply dithering
 
     px = resized_image.load()
+    pxbw = resized_image_bw.load()
     terminal_string = f"{idx + 1}\n"
-    terminal_string += f"{convert_timedelta_to_srt_format(one_frame_in_ms, idx)} --> {convert_timedelta_to_srt_format(one_frame_in_ms, idx + 1)}\n"
+    if preview:
+        terminal_string += f"{convert_timedelta_to_srt_format(one_frame_in_ms, idx)} --> {convert_timedelta_to_srt_format(one_frame_in_ms, idx + 1)}\n"
 
     smi_string = f"<SYNC Start={convert_timedelta_to_srt_format(one_frame_in_ms, idx)}><P Class=KOKRCC>"
 
@@ -88,10 +90,11 @@ for idx in range(0, len(frames_folder), video_config.frame_jump):
             for local_w in range(braille_config.width):
                 for local_h in range(braille_config.height):
                     r, g, b, *rest = px[w + local_w, h + local_h]  # ignore alpha
+                    bw = pxbw[w + local_w, h + local_h]  # dithered version
                     braille_r += r
                     braille_g += g
                     braille_b += b
-                    if grayscale(r, g, b) > hex_threshold:
+                    if bw > hex_threshold:  # use dithered version of pixels
                         braille[local_w * braille_config.height + local_h] = True
             output = braille_config.base
             for b_idx, val in enumerate(braille):
@@ -100,9 +103,10 @@ for idx in range(0, len(frames_folder), video_config.frame_jump):
             braille_r //= braille_config.width * braille_config.height
             braille_g //= braille_config.width * braille_config.height
             braille_b //= braille_config.width * braille_config.height
-            terminal_string += "\033[38;2;{};{};{}m{}\033[38;2;255;255;255m".format(
-                braille_r, braille_g, braille_b, chr(output)
-            )
+            if preview:
+                terminal_string += "\033[38;2;{};{};{}m{}\033[38;2;255;255;255m".format(
+                    braille_r, braille_g, braille_b, chr(output)
+                )
             hex_color = "#%02X%02X%02X" % (braille_r, braille_g, braille_b)
             if color_stack_color == hex_color:
                 color_stack_value += chr(output)
@@ -120,7 +124,8 @@ for idx in range(0, len(frames_folder), video_config.frame_jump):
         )
         color_stack_color = ""
         color_stack_value = ""
-        terminal_string += "\n"
+        if preview:
+            terminal_string += "\n"
         smi_string += "<BR>"
     smi_string += "</SYNC>"
     with open(f"{video_name}.smi", "a", encoding="UTF-8") as file:
