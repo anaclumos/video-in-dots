@@ -1,8 +1,8 @@
 from PIL import Image
 import os
 
-video_name = "fiesta"
-fps = 23.980618307905036
+video_name = input("video name: ")
+fps = 23.980458527730313
 file_format = "jpg"
 
 
@@ -20,8 +20,8 @@ class braille_config:
 
 
 class video_config:
-    width = 80
-    height = 40
+    width = 192
+    height = 82
 
 
 def resize(image: Image.Image, width: int, height: int) -> Image.Image:
@@ -50,7 +50,6 @@ def convert_timedelta_to_srt_format(delta_in_ms: float, framecount: int):
 hex_threshold = 128
 frames_folder = sorted(os.listdir(os.getcwd() + "/frames/" + video_name))
 one_frame_in_ms = 1000.0 / fps
-terminal_columns, terminal_rows = os.get_terminal_size(0)
 
 for idx in range(len(frames_folder)):
     normalized_path = os.path.abspath(
@@ -63,7 +62,6 @@ for idx in range(len(frames_folder)):
 
     px = resized_image.load()
     terminal_string = f"{idx + 1}\n"
-    terminal_string += f"{convert_timedelta_to_srt_format(one_frame_in_ms, idx)} --> {convert_timedelta_to_srt_format(one_frame_in_ms, idx + 1)}\n"
     srt_string = f"{idx + 1}\n"
     srt_string += f"{convert_timedelta_to_srt_format(one_frame_in_ms, idx)} --> {convert_timedelta_to_srt_format(one_frame_in_ms, idx + 1)}\n"
 
@@ -88,13 +86,12 @@ for idx in range(len(frames_folder)):
             braille_r //= braille_config.width * braille_config.height
             braille_g //= braille_config.width * braille_config.height
             braille_b //= braille_config.width * braille_config.height
-            terminal_string += "\033[38;2;{};{};{}m{}\033[38;2;255;255;255m".format(
-                braille_r, braille_g, braille_b, chr(output)
-            )
+            # terminal_string += "\033[38;2;{};{};{}m{}\033[38;2;255;255;255m".format(
+            #     braille_r, braille_g, braille_b, chr(output)
+            # )
             hex_color = "#%02X%02X%02X" % (braille_r, braille_g, braille_b)
             srt_string += f'<font color="#{hex_color}">' + chr(output) + "</font>"
-        terminal_string += "\n"
         srt_string += "\n"
-    with open("output.srt", "a", encoding="UTF-8") as file:
+    with open(f"{video_name}.srt", "a", encoding="UTF-8") as file:
         file.write(srt_string + "\n")
     print(terminal_string)
