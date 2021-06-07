@@ -2,7 +2,7 @@ import cv2
 import os
 import pathlib
 
-video = "/Users/sunghyuncho/Movies/fiesta.mp4"
+video = "/Users/sunghyuncho/video.mp4"
 
 
 class termcolor:
@@ -14,6 +14,7 @@ class termcolor:
 normalized_path = os.path.abspath(video)
 if not pathlib.Path(normalized_path).exists():
     print(termcolor.FAIL + "× " + termcolor.ENDC + normalized_path)
+    exit()
 basename = os.path.basename(normalized_path)
 dirname = os.path.dirname(normalized_path)
 filename = basename.rsplit(".", 1)[0]
