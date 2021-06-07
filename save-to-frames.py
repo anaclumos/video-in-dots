@@ -11,13 +11,6 @@ class termcolor:
     ENDC = "\033[0m"
 
 
-class braille_config:
-    # 2 * 3 braille
-    base = 0x2800
-    width = 2
-    height = 3
-
-
 normalized_path = os.path.abspath(video)
 if not pathlib.Path(normalized_path).exists():
     print(termcolor.FAIL + "× " + termcolor.ENDC + normalized_path)
