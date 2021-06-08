@@ -3,7 +3,8 @@ import os
 
 video_name = input("video name: ")
 dithering = input("enable dithering? (y/n) : ").lower() == "y"
-fps = 23.980458527730313
+preview = input("enable preview? (y/n) : ").lower() == "y"
+fps = 23.98006851448147
 file_format = "jpg"
 
 
@@ -21,8 +22,8 @@ class braille_config:
 
 
 class video_config:
-    width = 96
-    height = 54
+    width = 48
+    height = 27
 
 
 def resize(image: Image.Image, width: int, height: int) -> Image.Image:
@@ -47,7 +48,6 @@ def convert_timedelta_to_srt_format(delta_in_ms: float, framecount: int):
 hex_threshold = 128
 frames_folder = sorted(os.listdir(os.getcwd() + "/frames/" + video_name))
 one_frame_in_ms = 1000.0 / fps
-
 for idx in range(len(frames_folder)):
     normalized_path = os.path.abspath(
         f"{os.getcwd()}/frames/{video_name}/f{idx}.{file_format}"
@@ -60,9 +60,10 @@ for idx in range(len(frames_folder)):
 
     px = resized_image.load()
     pxbw = resized_image_bw.load()
-    terminal_string = f"{idx + 1}\n"
     srt_string = f"{idx + 1}\n"
     srt_string += f"{convert_timedelta_to_srt_format(one_frame_in_ms, idx)} --> {convert_timedelta_to_srt_format(one_frame_in_ms, idx + 1)}\n"
+    terminal_string = f"{idx + 1}\n"
+    terminal_string += f"{convert_timedelta_to_srt_format(one_frame_in_ms, idx)} --> {convert_timedelta_to_srt_format(one_frame_in_ms, idx + 1)}\n"
 
     color_stack_color = ""
     color_stack_value = ""
@@ -89,9 +90,10 @@ for idx in range(len(frames_folder)):
             braille_r //= braille_config.width * braille_config.height
             braille_g //= braille_config.width * braille_config.height
             braille_b //= braille_config.width * braille_config.height
-            # terminal_string += "\033[38;2;{};{};{}m{}\033[38;2;255;255;255m".format(
-            #     braille_r, braille_g, braille_b, chr(output)
-            # )
+            if preview:
+                terminal_string += "\033[38;2;{};{};{}m{}\033[38;2;255;255;255m".format(
+                    braille_r, braille_g, braille_b, chr(output)
+                )
             hex_color = "#%02X%02X%02X" % (braille_r, braille_g, braille_b)
             if color_stack_color == hex_color:
                 color_stack_value += chr(output)
@@ -105,11 +107,14 @@ for idx in range(len(frames_folder)):
                 color_stack_color = hex_color
                 color_stack_value = chr(output)
         srt_string += (
-            f'<font color="#{color_stack_color}">' + color_stack_value + "</font>"
+            f'<font color="{color_stack_color}">' + color_stack_value + "</font>"
         )
-        color_stack_color = ""
         color_stack_value = ""
+        color_stack_color = ""
+        if preview:
+            terminal_string += "\n"
         srt_string += "\n"
-    with open(f"{video_name}.srt", "a", encoding="UTF-8") as file:
+    savename = f"{video_name}{'-dithered' if dithering else ''}-{video_config.width}-{video_config.height}.srt"
+    with open(savename, "a", encoding="UTF-8") as file:
         file.write(srt_string + "\n")
     print(terminal_string)
