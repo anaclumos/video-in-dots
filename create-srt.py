@@ -4,7 +4,7 @@ import os
 video_name = input("video name: ")
 dithering = input("enable dithering? (y/n) : ").lower() == "y"
 preview = input("enable preview? (y/n) : ").lower() == "y"
-fps = 23.98006851448147
+fps = 23.976292055738558
 file_format = "jpg"
 
 
@@ -24,6 +24,7 @@ class braille_config:
 class video_config:
     width = 48
     height = 27
+    frame_jump = 3  # reduces framerate by 3
 
 
 def resize(image: Image.Image, width: int, height: int) -> Image.Image:
@@ -48,7 +49,8 @@ def convert_timedelta_to_srt_format(delta_in_ms: float, framecount: int):
 hex_threshold = 128
 frames_folder = sorted(os.listdir(os.getcwd() + "/frames/" + video_name))
 one_frame_in_ms = 1000.0 / fps
-for idx in range(len(frames_folder)):
+
+for idx in range(0, len(frames_folder), video_config.frame_jump):
     normalized_path = os.path.abspath(
         f"{os.getcwd()}/frames/{video_name}/f{idx}.{file_format}"
     )
