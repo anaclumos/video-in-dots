@@ -23,8 +23,8 @@ class braille_config:
 
 class video_config:
     width = 48
-    height = 27
-    frame_jump = 3  # reduces framerate by 3
+    height = 24
+    frame_jump = 4
 
 
 def resize(image: Image.Image, width: int, height: int) -> Image.Image:
@@ -63,9 +63,9 @@ for idx in range(0, len(frames_folder), video_config.frame_jump):
     px = resized_image.load()
     pxbw = resized_image_bw.load()
     srt_string = f"{idx + 1}\n"
-    srt_string += f"{convert_timedelta_to_srt_format(one_frame_in_ms, idx)} --> {convert_timedelta_to_srt_format(one_frame_in_ms, idx + 1)}\n"
+    srt_string += f"{convert_timedelta_to_srt_format(one_frame_in_ms, idx)} --> {convert_timedelta_to_srt_format(one_frame_in_ms, idx + video_config.frame_jump)}\n"
     terminal_string = f"{idx + 1}\n"
-    terminal_string += f"{convert_timedelta_to_srt_format(one_frame_in_ms, idx)} --> {convert_timedelta_to_srt_format(one_frame_in_ms, idx + 1)}\n"
+    terminal_string += f"{convert_timedelta_to_srt_format(one_frame_in_ms, idx)} --> {convert_timedelta_to_srt_format(one_frame_in_ms, idx + video_config.frame_jump)}\n"
 
     color_stack_color = ""
     color_stack_value = ""
@@ -116,7 +116,7 @@ for idx in range(0, len(frames_folder), video_config.frame_jump):
         if preview:
             terminal_string += "\n"
         srt_string += "\n"
-    savename = f"{video_name}{'-dithered' if dithering else ''}-{video_config.width}-{video_config.height}.srt"
+    savename = f"{video_name}{'-dithered' if dithering else ''}{('-jump-' + str(video_config.frame_jump)) if video_config.frame_jump != 0 else ''}-{video_config.width}-{video_config.height}.srt"
     with open(savename, "a", encoding="UTF-8") as file:
         file.write(srt_string + "\n")
     print(terminal_string)
