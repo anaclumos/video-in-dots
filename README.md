@@ -4,6 +4,13 @@ This code will convert a video into braille subtitles. Watch an example video on
 
 Will write more READMEs & technical writeups soon.
 
+## If you want to run this code
+
+1. Rename your video to simpler words (for easier typing)
+1. Edit and run `save-to-frames.py`.
+1. If you want to run file locally, edit and run `create-srt.py`.
+1. If you want to upload subtitles to YouTube, edit and run `create-smi.py`. Note that YouTube only accepts subtitles with 10MB file size limit.
+
 ## Creating a black video for testing subtitles
 
 ```
