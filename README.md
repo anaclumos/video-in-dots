@@ -1,6 +1,6 @@
 # Video to Braille Subtitles
 
-This code will convert a video into braille subtitles. Watch an example video on **[YouTube](https://youtu.be/t_YsTEhcTpo)**.
+This code will convert a video into braille subtitles. Watch an example video on **[YouTube](https://youtu.be/t_YsTEhcTpo)**. If the video errors in any way, you can take a look at my [screen recording](https://youtu.be/-Dby42c_4Y4).
 
 - [technical writeup in Korean](https://blog.chosunghyun.com/kr-video-braille-pattern-stream/)
 
